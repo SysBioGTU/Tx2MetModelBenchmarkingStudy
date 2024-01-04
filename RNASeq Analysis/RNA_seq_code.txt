@@ -1,0 +1,27 @@
+
+
+
+#FASTQC
+fastqc x1.fastq x2.fastq -t 35 -o /directory..
+
+
+#TRIMMOMATIC
+java -Xmx4g -jar "/..../Trimmomatic-0.39/trimmomatic-0.39.jar" PE -threads 35 x1.fastq x2.fastq  "/.../x1_trimmed_p1.fastq" "/.../x1_trimmed_u1.fastq" "/.../x2_trimmed_p2.fastq" "/.../x2_trimmed_u2.fastq" ILLUMINACLIP:..../Trimmomatic-0.39/adapters/File.fa:2:30:10 LEADING:20 TRAILING:20 SLIDINGWINDOW:5:20 MINLEN:20 
+
+
+
+#STAR: INDEXING
+STAR --runMode genomeGenerate --genomeDir "/.../STAR_v2_7_8a_index" --genomeFastaFiles "/.../GRCh38.primary_assembly.genome.fa" --sjdbGTFfile  "/.../gencode.v37.chr_patch_hapl_scaff.annotation.gtf" --runThreadN 25 --sjdbOverhang 12
+
+
+
+#STAR: ALIGNMENT
+STAR --genomeDir "/.../STAR_v2_7_8a_Overhang99_index1_hs" --readFilesIn "/.../x1_trimmed_p1.fastq" "/.../x2_trimmed_p2.fastq" --outFileNamePrefix "/.../_star_" --runThreadN 20 --outSAMtype BAM SortedByCoordinate
+
+
+
+#FEATURECOUNTS
+"/.../subread-2.0.2-Linux-x86_64/bin/featureCounts" -p -a  "/.../gencode.v37.chr_patch_hapl_scaff.annotation.gtf" -o "/.../x_featurecounts.txt" "/.../x_star_Aligned.sortedByCoord.out.bam" -T 24 
+
+
+

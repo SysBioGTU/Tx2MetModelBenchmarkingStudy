@@ -1,0 +1,48 @@
+---
+title: "figures"
+output: html_document
+date: "2023-10-17"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Bar plot
+This code can be used for generating bar plots in Figure 2
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(readxl)
+Table2_barplot <- read_excel("./Table2_barplot_AD_LUAD.xlsx")
+
+data1<- Table2_barplot
+data1$dataset<- as.factor(data1$dataset)
+ad<- filter(data1, dataset=="ROSMAP")
+ad<-mutate(ad,log=log2(number))
+luad<-filter(data1, dataset=="LUAD")
+luad<-mutate(luad,log=log2(number))
+```
+
+
+## Including Plots
+```{r}
+ggplot(ad, aes(y=log, x=factor(normalization, level=c('DESeq2','DESeq2_cov','edgeR','edgeR_cov', 'GeTMM','GeTMM_cov', 'FPKM','FPKM_cov','TPM','TPM_cov')), fill= factor(condition,levels=c("pathway","reaction")))) + 
+    geom_bar(position="stack",stat="identity") +   #position="dodge"
+  scale_fill_manual(values=c('#bdd7e7', '#6baed6'))+
+  theme_classic()+
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+    labs(x="ROSMAP cohort", fill = "")
+ggsave(file="Table2toFigure.png", width=7, height=6, dpi=1200)
+
+ggplot(luad, aes(y=log, x=factor(normalization, level=c('DESeq2','edgeR', 'GeTMM','FPKM','TPM')), fill= factor(condition,levels=c("pathway","reaction")))) + 
+    geom_bar(position="stack",stat="identity") +   #position="dodge"
+  scale_fill_manual(values=c('#bdd7e7', '#6baed6'))+
+  theme_classic()+
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+    labs(x="TCGA cohort", fill = "")
+ggsave(file="Table2toFigure.png", width=7, height=6, dpi=1200)
+
+```
+
+
